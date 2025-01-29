@@ -8,20 +8,40 @@ const App = () => {
   const [user, setUser] = useState(null)
   const [blogs, setBlogs] = useState([])
 
+  // Load user from localStorage on app start
+  useEffect(() => {
+    const loggedUserJSON = window.localStorage.getItem('loggedBloglistUser')
+    if (loggedUserJSON) {
+      const user = JSON.parse(loggedUserJSON)
+      setUser(user)
+      blogService.setToken(user.token) // Set token for authenticated requests
+    }
+  }, [])
+
+  // Fetch blogs only when user is logged in
   useEffect(() => {
     if (user) {
       blogService.getAll().then(blogs => setBlogs(blogs))
     }
-  }, [user]) // Fetch blogs only when user is logged in
+  }, [user]) 
 
   const handleLogin = async (credentials) => {
     try {
       const response = await axios.post('/api/login', credentials)
-      setUser(response.data) // Save user data including token
-      blogService.setToken(response.data.token) // Set token for blog requests
+      const user = response.data
+      window.localStorage.setItem('loggedBloglistUser', JSON.stringify(user)) // Save to localStorage
+      setUser(user)
+      blogService.setToken(user.token) 
     } catch (error) {
       console.error('Login failed:', error.response?.data?.error || error.message)
     }
+  }
+
+  const handleLogout = () => {
+    window.localStorage.removeItem('loggedBloglistUser') // Remove from localStorage
+    setUser(null)
+    setBlogs([]) // Clear blogs
+    blogService.setToken(null) // Reset API token
   }
 
   if (!user) {
@@ -36,10 +56,8 @@ const App = () => {
   return (
     <div>
       <h2>blogs</h2>
-      <p>{user.name} logged in</p>
-      {blogs.map(blog =>
-        <Blog key={blog.id} blog={blog} />
-      )}
+      <p>{user.name} logged in <button onClick={handleLogout}>logout</button></p>
+      {blogs.map(blog => <Blog key={blog.id} blog={blog} />)}
     </div>
   )
 }
