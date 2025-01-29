@@ -3,7 +3,7 @@ import { useState } from 'react'
 const LoginForm = ({ handleLogin }) => {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
-  const [error, setError] = useState(null) // To handle login errors
+  const [error, setError] = useState(null) // this handles loginerrors
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -13,6 +13,16 @@ const LoginForm = ({ handleLogin }) => {
     } catch (exception) {
       setError('Invalid username or password') // Show error if login fails
     }
+  }
+
+  const handleUsernameChange = ({ target }) => {
+    setUsername(target.value)
+    if (error) setError(null) // Clear error when user starts typing
+  }
+
+  const handlePasswordChange = ({ target }) => {
+    setPassword(target.value)
+    if (error) setError(null) // Clear error when user starts typing
   }
 
   return (
@@ -25,7 +35,7 @@ const LoginForm = ({ handleLogin }) => {
             id="username"
             value={username}
             name="Username"
-            onChange={({ target }) => setUsername(target.value)}
+            onChange={handleUsernameChange}
           />
         </div>
         <div>
@@ -35,7 +45,7 @@ const LoginForm = ({ handleLogin }) => {
             id="password"
             value={password}
             name="Password"
-            onChange={({ target }) => setPassword(target.value)}
+            onChange={handlePasswordChange}
           />
         </div>
         <button type="submit">Login</button>

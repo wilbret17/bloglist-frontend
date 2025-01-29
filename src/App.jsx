@@ -3,6 +3,7 @@ import axios from 'axios'
 import LoginForm from './components/LoginForm'
 import Blog from './components/Blog'
 import blogService from './services/blogs'
+import Togglable from './components/Togglable'
 
 const App = () => {
   const [user, setUser] = useState(null)
@@ -10,7 +11,7 @@ const App = () => {
   const [newTitle, setNewTitle] = useState('')
   const [newAuthor, setNewAuthor] = useState('')
   const [newUrl, setNewUrl] = useState('')
-  const [notification, setNotification] = useState(null) // State for notifications
+  const [notification, setNotification] = useState(null)
 
   // Load user from localStorage on app start
   useEffect(() => {
@@ -22,7 +23,7 @@ const App = () => {
     }
   }, [])
 
-  // Fetch blogs only when user is logged in
+  // get blogs only if user is logged in
   useEffect(() => {
     if (user) {
       blogService.getAll().then(blogs => setBlogs(blogs))
@@ -33,23 +34,23 @@ const App = () => {
     try {
       const response = await axios.post('/api/login', credentials)
       const user = response.data
-      window.localStorage.setItem('loggedBloglistUser', JSON.stringify(user)) // Save to localStorage
+      window.localStorage.setItem('loggedBloglistUser', JSON.stringify(user))
       setUser(user)
       blogService.setToken(user.token)
-      setNotification('Login successful') // Success message for login
-      setTimeout(() => setNotification(null), 5000) // Clear notification after 5 seconds
+      setNotification('Login successful')
+      setTimeout(() => setNotification(null), 5000)
     } catch (error) {
       console.error('Login failed:', error.response?.data?.error || error.message)
-      setNotification('Login failed: Incorrect username or password') // Error message for failed login
-      setTimeout(() => setNotification(null), 5000) // Clear notification after 5 seconds
+      setNotification('Login failed: Incorrect username or password')
+      setTimeout(() => setNotification(null), 5000)
     }
   }
 
   const handleLogout = () => {
-    window.localStorage.removeItem('loggedBloglistUser') // Remove from localStorage
+    window.localStorage.removeItem('loggedBloglistUser')
     setUser(null)
-    setBlogs([]) // Clear blogs
-    blogService.setToken(null) // Reset API token
+    setBlogs([])
+    blogService.setToken(null)
     setNotification('Logged out successfully')
     setTimeout(() => setNotification(null), 5000)
   }
@@ -58,17 +59,17 @@ const App = () => {
     event.preventDefault()
     try {
       const newBlog = { title: newTitle, author: newAuthor, url: newUrl }
-      const addedBlog = await blogService.create(newBlog) // Send the new blog to the backend
-      setBlogs(blogs.concat(addedBlog)) // Add the new blog to the current list
-      setNewTitle('') // Clear the form fields
+      const addedBlog = await blogService.create(newBlog)
+      setBlogs(blogs.concat(addedBlog))
+      setNewTitle('')
       setNewAuthor('')
       setNewUrl('')
-      setNotification('New blog added successfully') // Success message for blog addition
-      setTimeout(() => setNotification(null), 5000) // Clear notification after 5 seconds
+      setNotification('New blog added successfully')
+      setTimeout(() => setNotification(null), 5000)
     } catch (error) {
       console.error('Error adding blog:', error)
-      setNotification('Failed to add new blog') // Error message for blog addition
-      setTimeout(() => setNotification(null), 5000) // Clear notification after 5 seconds
+      setNotification('Failed to add new blog')
+      setTimeout(() => setNotification(null), 5000)
     }
   }
 
@@ -85,33 +86,37 @@ const App = () => {
           <h2>blogs</h2>
           <p>{user.name} logged in <button onClick={handleLogout}>logout</button></p>
           {blogs.map(blog => <Blog key={blog.id} blog={blog} />)}
-          <form onSubmit={handleAddBlog}>
-            <div>
-              Title:
-              <input
-                type="text"
-                value={newTitle}
-                onChange={(e) => setNewTitle(e.target.value)}
-              />
-            </div>
-            <div>
-              Author:
-              <input
-                type="text"
-                value={newAuthor}
-                onChange={(e) => setNewAuthor(e.target.value)}
-              />
-            </div>
-            <div>
-              URL:
-              <input
-                type="text"
-                value={newUrl}
-                onChange={(e) => setNewUrl(e.target.value)}
-              />
-            </div>
-            <button type="submit">Create</button>
-          </form>
+
+          {/* Togglable form for creating new blogs */}
+          <Togglable buttonLabel="Create new blog" cancelButtonLabel="Cancel">
+            <form onSubmit={handleAddBlog}>
+              <div>
+                Title:
+                <input
+                  type="text"
+                  value={newTitle}
+                  onChange={(e) => setNewTitle(e.target.value)}
+                />
+              </div>
+              <div>
+                Author:
+                <input
+                  type="text"
+                  value={newAuthor}
+                  onChange={(e) => setNewAuthor(e.target.value)}
+                />
+              </div>
+              <div>
+                URL:
+                <input
+                  type="text"
+                  value={newUrl}
+                  onChange={(e) => setNewUrl(e.target.value)}
+                />
+              </div>
+              <button type="submit">Create</button>
+            </form>
+          </Togglable>
         </div>
       )}
     </div>
