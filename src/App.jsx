@@ -77,7 +77,7 @@ const App = () => {
           <h2>blogs</h2>
           <p>{user.name} logged in <button onClick={handleLogout}>logout</button></p>
           {blogs.map(blog => <Blog key={blog.id} blog={blog} />)}
-          
+
           {/* Add the Togglable component to show/hide the form */}
           <Togglable buttonLabel="Create new blog">
             <BlogForm createBlog={handleAddBlog} />
