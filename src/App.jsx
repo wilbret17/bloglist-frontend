@@ -2,15 +2,13 @@ import { useState, useEffect } from 'react'
 import axios from 'axios'
 import LoginForm from './components/LoginForm'
 import Blog from './components/Blog'
-import blogService from './services/blogs'
+import BlogForm from './components/BlogForm'
 import Togglable from './components/Togglable'
+import blogService from './services/blogs'
 
 const App = () => {
   const [user, setUser] = useState(null)
   const [blogs, setBlogs] = useState([])
-  const [newTitle, setNewTitle] = useState('')
-  const [newAuthor, setNewAuthor] = useState('')
-  const [newUrl, setNewUrl] = useState('')
   const [notification, setNotification] = useState(null)
 
   // Load user from localStorage on app start
@@ -19,11 +17,11 @@ const App = () => {
     if (loggedUserJSON) {
       const user = JSON.parse(loggedUserJSON)
       setUser(user)
-      blogService.setToken(user.token) // Set token for authenticated requests
+      blogService.setToken(user.token)
     }
   }, [])
 
-  // get blogs only if user is logged in
+  // Fetch blogs only when user is logged in
   useEffect(() => {
     if (user) {
       blogService.getAll().then(blogs => setBlogs(blogs))
@@ -40,7 +38,6 @@ const App = () => {
       setNotification('Login successful')
       setTimeout(() => setNotification(null), 5000)
     } catch (error) {
-      console.error('Login failed:', error.response?.data?.error || error.message)
       setNotification('Login failed: Incorrect username or password')
       setTimeout(() => setNotification(null), 5000)
     }
@@ -55,19 +52,13 @@ const App = () => {
     setTimeout(() => setNotification(null), 5000)
   }
 
-  const handleAddBlog = async (event) => {
-    event.preventDefault()
+  const handleAddBlog = async (newBlog) => {
     try {
-      const newBlog = { title: newTitle, author: newAuthor, url: newUrl }
       const addedBlog = await blogService.create(newBlog)
       setBlogs(blogs.concat(addedBlog))
-      setNewTitle('')
-      setNewAuthor('')
-      setNewUrl('')
       setNotification('New blog added successfully')
       setTimeout(() => setNotification(null), 5000)
     } catch (error) {
-      console.error('Error adding blog:', error)
       setNotification('Failed to add new blog')
       setTimeout(() => setNotification(null), 5000)
     }
@@ -86,36 +77,10 @@ const App = () => {
           <h2>blogs</h2>
           <p>{user.name} logged in <button onClick={handleLogout}>logout</button></p>
           {blogs.map(blog => <Blog key={blog.id} blog={blog} />)}
-
-          {/* Togglable form for creating new blogs */}
-          <Togglable buttonLabel="Create new blog" cancelButtonLabel="Cancel">
-            <form onSubmit={handleAddBlog}>
-              <div>
-                Title:
-                <input
-                  type="text"
-                  value={newTitle}
-                  onChange={(e) => setNewTitle(e.target.value)}
-                />
-              </div>
-              <div>
-                Author:
-                <input
-                  type="text"
-                  value={newAuthor}
-                  onChange={(e) => setNewAuthor(e.target.value)}
-                />
-              </div>
-              <div>
-                URL:
-                <input
-                  type="text"
-                  value={newUrl}
-                  onChange={(e) => setNewUrl(e.target.value)}
-                />
-              </div>
-              <button type="submit">Create</button>
-            </form>
+          
+          {/* Add the Togglable component to show/hide the form */}
+          <Togglable buttonLabel="Create new blog">
+            <BlogForm createBlog={handleAddBlog} />
           </Togglable>
         </div>
       )}
