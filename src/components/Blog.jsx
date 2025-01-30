@@ -8,11 +8,7 @@ const Blog = ({ blog, handleLike }) => {
   };
   
   const incrementLike = () => {
-    handleLike({
-      ...blog,
-      likes: blog.likes + 1,
-      user: blog.user?.id || blog.user // Handle both populated and unpopulated user
-    })
+    handleLike(blog);
   }
 
   return (
@@ -28,6 +24,7 @@ const Blog = ({ blog, handleLike }) => {
           <p>{blog.url}</p>
           <p>{blog.likes} likes</p>
           <button onClick={incrementLike}>like</button>
+          {blog.user && <p>{blog.user.name}</p>} {/* Display user name */}
         </div>
       )}
     </div>

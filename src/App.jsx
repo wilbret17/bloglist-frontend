@@ -67,15 +67,26 @@ const App = () => {
   
   const handleLike = async (blogToUpdate) => {
     try {
-      const updatedBlog = await blogService.update(blogToUpdate.id, blogToUpdate)
+      // Create a new blog object with incremented likes
+      const updatedBlog = {
+        ...blogToUpdate,
+        likes: blogToUpdate.likes + 1, 
+        user: blogToUpdate.user ? blogToUpdate.user.id : blogToUpdate.user // Ensure user is passed correctly
+      };
+  
+      // Send the PUT request
+      const response = await blogService.update(blogToUpdate.id, updatedBlog);
+  
+      // Ensure that the user object is preserved
       setBlogs(blogs.map(blog => 
-        blog.id === updatedBlog.id ? updatedBlog : blog
-      ))
+        blog.id === response.id ? { ...response, user: blogToUpdate.user } : blog
+      ));
     } catch (exception) {
-      // Handle error (e.g., show notification)
-      console.error('Failed to update likes:', exception)
+      console.error('Failed to update likes:', exception);
     }
-  }
+  };
+  
+  
 
   return (
     <div>
