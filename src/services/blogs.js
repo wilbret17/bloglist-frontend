@@ -20,12 +20,12 @@ const getAll = async () => {
   }
 }
 
-const create = async (newObject) => {
+const create = async (newBlog) => {
   try {
     const config = {
       headers: { Authorization: token }
     }
-    const response = await axios.post(baseUrl, newObject, config)
+    const response = await axios.post(baseUrl, newBlog, config)
     return response.data
   } catch (error) {
     console.error('Error creating blog:', error.response?.data?.error || error.message)
@@ -33,4 +33,12 @@ const create = async (newObject) => {
   }
 }
 
-export default { getAll, setToken, create }
+const update = async (id, updatedBlog) => {
+  const config = {
+    headers: { Authorization: token }
+  }
+  const response = await axios.put(`${baseUrl}/${id}`, updatedBlog, config)
+  return response.data
+}
+
+export default { getAll, setToken, create, update }

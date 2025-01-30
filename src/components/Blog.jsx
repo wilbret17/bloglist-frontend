@@ -1,11 +1,19 @@
 import { useState } from 'react';
 
-const Blog = ({ blog }) => {
+const Blog = ({ blog, handleLike }) => {
   const [detailsVisible, setDetailsVisible] = useState(false);
 
   const toggleDetails = () => {
     setDetailsVisible(!detailsVisible);
   };
+  
+  const incrementLike = () => {
+    handleLike({
+      ...blog,
+      likes: blog.likes + 1,
+      user: blog.user?.id || blog.user // Handle both populated and unpopulated user
+    })
+  }
 
   return (
     <div style={{ paddingTop: 10, paddingLeft: 2, border: 'solid', borderWidth: 1, marginBottom: 5 }}>
@@ -19,7 +27,7 @@ const Blog = ({ blog }) => {
         <div>
           <p>{blog.url}</p>
           <p>{blog.likes} likes</p>
-          <button>like</button>
+          <button onClick={incrementLike}>like</button>
         </div>
       )}
     </div>

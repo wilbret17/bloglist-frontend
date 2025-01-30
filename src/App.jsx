@@ -6,6 +6,7 @@ import BlogForm from './components/BlogForm'
 import Togglable from './components/Togglable'
 import blogService from './services/blogs'
 
+
 const App = () => {
   const [user, setUser] = useState(null)
   const [blogs, setBlogs] = useState([])
@@ -63,6 +64,18 @@ const App = () => {
       setTimeout(() => setNotification(null), 5000)
     }
   }
+  
+  const handleLike = async (blogToUpdate) => {
+    try {
+      const updatedBlog = await blogService.update(blogToUpdate.id, blogToUpdate)
+      setBlogs(blogs.map(blog => 
+        blog.id === updatedBlog.id ? updatedBlog : blog
+      ))
+    } catch (exception) {
+      // Handle error (e.g., show notification)
+      console.error('Failed to update likes:', exception)
+    }
+  }
 
   return (
     <div>
@@ -76,7 +89,7 @@ const App = () => {
         <div>
           <h2>blogs</h2>
           <p>{user.name} logged in <button onClick={handleLogout}>logout</button></p>
-          {blogs.map(blog => <Blog key={blog.id} blog={blog} />)}
+          {blogs.map(blog => <Blog key={blog.id} blog={blog} handleLike={handleLike} />)}
 
           {/* Add the Togglable component to show/hide the form */}
           <Togglable buttonLabel="Create new blog">
