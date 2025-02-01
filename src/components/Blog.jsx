@@ -14,31 +14,27 @@ const Blog = ({ blog, handleLike, handleDelete, user }) => {
   const deleteBlog = () => {
     const confirmDelete = window.confirm(`Are you sure you want to delete ${blog.title}?`)
     if (confirmDelete) {
-      handleDelete(blog.id) // Call handleDelete function
+      handleDelete(blog.id)
     }
   }
 
-  console.log('User:', user) // This will log the current logged-in user
-  console.log('Blog User:', blog.user) // This will log the user object of the blog
-
   return (
-    <div style={{ paddingTop: 10, paddingLeft: 2, border: 'solid', borderWidth: 1, marginBottom: 5 }}>
-      <div>
+    <div className="blog" style={{ paddingTop: 10, paddingLeft: 2, border: 'solid', borderWidth: 1, marginBottom: 5 }}>
+      <div className="blog-summary">
         {blog.title} {blog.author}
-        <button onClick={toggleDetails}>
+        <button onClick={toggleDetails} className="toggle-details-btn">
           {detailsVisible ? 'Hide details' : 'View details'}
         </button>
       </div>
       {detailsVisible && (
-        <div>
-          <p>{blog.url}</p>
-          <p>{blog.likes} likes</p>
-          <button onClick={incrementLike}>like</button>
-          {blog.user && <p>{blog.user.name}</p>} {/* Display user name */}
+        <div className="blog-details">
+          <p className="blog-url">{blog.url}</p>
+          <p className="blog-likes">{blog.likes} likes</p>
+          <button onClick={incrementLike} className="like-btn">like</button>
+          {blog.user && <p className="blog-user">{blog.user.name}</p>}
 
-          {/* Only show the delete button if the user is the blog author */}
           {user && blog.user && blog.user.id === user.id && (
-            <button onClick={deleteBlog}>Delete</button>
+            <button onClick={deleteBlog} className="delete-btn">Delete</button>
           )}
         </div>
       )}
