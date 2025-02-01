@@ -18,7 +18,7 @@ const App = () => {
       const user = JSON.parse(loggedUserJSON)
       // Check if the ID is missing and manually add it if needed
       if (!user.id) {
-        user.id = 'some-default-id'; // This is a fallback or a way to fetch it
+        user.id = 'some-default-id' // This is a fallback or a way to fetch it
       }
       setUser(user)  // Store the user object with id
       blogService.setToken(user.token)
@@ -36,7 +36,7 @@ const App = () => {
     try {
       const response = await axios.post('/api/login', credentials)
       const user = response.data
-      console.log(response.data);
+      console.log(response.data)
       window.localStorage.setItem('loggedBloglistUser', JSON.stringify(user))
       setUser(user)
       blogService.setToken(user.token)
@@ -68,39 +68,39 @@ const App = () => {
       setTimeout(() => setNotification(null), 5000)
     }
   }
-  
+
   const handleLike = async (blogToUpdate) => {
     try {
       const updatedBlog = {
         ...blogToUpdate,
-        likes: blogToUpdate.likes + 1, 
+        likes: blogToUpdate.likes + 1,
         user: blogToUpdate.user ? blogToUpdate.user.id : blogToUpdate.user
-      };
+      }
 
-      const response = await blogService.update(blogToUpdate.id, updatedBlog);
-      setBlogs(blogs.map(blog => 
+      const response = await blogService.update(blogToUpdate.id, updatedBlog)
+      setBlogs(blogs.map(blog =>
         blog.id === response.id ? { ...response, user: blogToUpdate.user } : blog
-      ));
+      ))
     } catch (exception) {
-      console.error('Failed to update likes:', exception);
+      console.error('Failed to update likes:', exception)
     }
-  };
-  
+  }
+
   const handleDelete = async (id) => {
     try {
-      await blogService.remove(id);
-      setBlogs(blogs.filter(blog => blog.id !== id));
-      setNotification('Blog deleted successfully');
-      setTimeout(() => setNotification(null), 5000);
+      await blogService.remove(id)
+      setBlogs(blogs.filter(blog => blog.id !== id))
+      setNotification('Blog deleted successfully')
+      setTimeout(() => setNotification(null), 5000)
     } catch (error) {
-      setNotification('Failed to delete blog');
-      setTimeout(() => setNotification(null), 5000);
+      setNotification('Failed to delete blog')
+      setTimeout(() => setNotification(null), 5000)
     }
-  };
+  }
 
-  const sortedBlogs = [...blogs].sort((a, b) => b.likes - a.likes);
+  const sortedBlogs = [...blogs].sort((a, b) => b.likes - a.likes)
 
-  console.log('Current User ID:', user?.id); // Check if user is loaded and ID is correct
+  console.log('Current User ID:', user?.id) // Check if user is loaded and ID is correct
 
 
   return (
@@ -116,12 +116,12 @@ const App = () => {
           <h2>blogs</h2>
           <p>{user.name} logged in <button onClick={handleLogout}>logout</button></p>
           {sortedBlogs.map(blog => (
-            <Blog 
-              key={blog.id} 
-              blog={blog} 
-              handleLike={handleLike} 
-              handleDelete={handleDelete} 
-              user={user} 
+            <Blog
+              key={blog.id}
+              blog={blog}
+              handleLike={handleLike}
+              handleDelete={handleDelete}
+              user={user}
             />
           ))}
 

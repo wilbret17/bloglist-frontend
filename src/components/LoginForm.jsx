@@ -1,9 +1,10 @@
 import { useState } from 'react'
+import PropTypes from 'prop-types'
 
 const LoginForm = ({ handleLogin }) => {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
-  const [error, setError] = useState(null) // this handles loginerrors
+  const [error, setError] = useState(null) // This handles login errors
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -53,6 +54,10 @@ const LoginForm = ({ handleLogin }) => {
       {error && <p style={{ color: 'red' }}>{error}</p>} {/* Display error message */}
     </div>
   )
+}
+
+LoginForm.propTypes = {
+  handleLogin: PropTypes.func.isRequired
 }
 
 export default LoginForm
