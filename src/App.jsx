@@ -6,7 +6,6 @@ import BlogForm from './components/BlogForm'
 import Togglable from './components/Togglable'
 import blogService from './services/blogs'
 
-
 const App = () => {
   const [user, setUser] = useState(null)
   const [blogs, setBlogs] = useState([])
@@ -17,7 +16,11 @@ const App = () => {
     const loggedUserJSON = window.localStorage.getItem('loggedBloglistUser')
     if (loggedUserJSON) {
       const user = JSON.parse(loggedUserJSON)
-      setUser(user)
+      // Check if the ID is missing and manually add it if needed
+      if (!user.id) {
+        user.id = 'some-default-id'; // This is a fallback or a way to fetch it
+      }
+      setUser(user)  // Store the user object with id
       blogService.setToken(user.token)
     }
   }, [])
@@ -33,6 +36,7 @@ const App = () => {
     try {
       const response = await axios.post('/api/login', credentials)
       const user = response.data
+      console.log(response.data);
       window.localStorage.setItem('loggedBloglistUser', JSON.stringify(user))
       setUser(user)
       blogService.setToken(user.token)
@@ -67,17 +71,13 @@ const App = () => {
   
   const handleLike = async (blogToUpdate) => {
     try {
-      // Create a new blog object with incremented likes
       const updatedBlog = {
         ...blogToUpdate,
         likes: blogToUpdate.likes + 1, 
-        user: blogToUpdate.user ? blogToUpdate.user.id : blogToUpdate.user // Ensure user is passed correctly
+        user: blogToUpdate.user ? blogToUpdate.user.id : blogToUpdate.user
       };
-  
-      // Send the PUT request
+
       const response = await blogService.update(blogToUpdate.id, updatedBlog);
-  
-      // Ensure that the user object is preserved
       setBlogs(blogs.map(blog => 
         blog.id === response.id ? { ...response, user: blogToUpdate.user } : blog
       ));
@@ -86,7 +86,22 @@ const App = () => {
     }
   };
   
+  const handleDelete = async (id) => {
+    try {
+      await blogService.remove(id);
+      setBlogs(blogs.filter(blog => blog.id !== id));
+      setNotification('Blog deleted successfully');
+      setTimeout(() => setNotification(null), 5000);
+    } catch (error) {
+      setNotification('Failed to delete blog');
+      setTimeout(() => setNotification(null), 5000);
+    }
+  };
+
   const sortedBlogs = [...blogs].sort((a, b) => b.likes - a.likes);
+
+  console.log('Current User ID:', user?.id); // Check if user is loaded and ID is correct
+
 
   return (
     <div>
@@ -100,7 +115,15 @@ const App = () => {
         <div>
           <h2>blogs</h2>
           <p>{user.name} logged in <button onClick={handleLogout}>logout</button></p>
-          {sortedBlogs.map(blog => <Blog key={blog.id} blog={blog} handleLike={handleLike} />)}
+          {sortedBlogs.map(blog => (
+            <Blog 
+              key={blog.id} 
+              blog={blog} 
+              handleLike={handleLike} 
+              handleDelete={handleDelete} 
+              user={user} 
+            />
+          ))}
 
           {/* Add the Togglable component to show/hide the form */}
           <Togglable buttonLabel="Create new blog">
