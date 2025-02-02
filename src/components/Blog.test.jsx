@@ -1,6 +1,7 @@
 import { render, screen, fireEvent } from '@testing-library/react'
 import Blog from './Blog'
 import { vi } from 'vitest'
+import BlogForm from './BlogForm'
 
 // Test for rendering blog title and author, but not URL or likes by default
 test('renders blog title and author but does not render url or likes by default', () => {
@@ -68,4 +69,29 @@ test('calls event handler twice when like button is clicked twice', () => {
   // Expect the like handler to be called twice
   expect(mockLikeHandler).toHaveBeenCalledTimes(2)
 })
+// Test for creating a new blog
+test('calls event handler with correct details when a new blog is created', () => {
+  const mockCreateBlog = vi.fn()
 
+  render(<BlogForm createBlog={mockCreateBlog} />)
+
+  // Find the form fields and fill them out
+  const titleInput = screen.getByLabelText(/title/i)
+  const authorInput = screen.getByLabelText(/author/i)
+  const urlInput = screen.getByLabelText(/url/i)
+  const submitButton = screen.getByRole('button', { name: /create/i })
+
+  fireEvent.change(titleInput, { target: { value: 'New Blog Title' } })
+  fireEvent.change(authorInput, { target: { value: 'John Doe' } })
+  fireEvent.change(urlInput, { target: { value: 'http://example.com/new-blog' } })
+
+  // Submit the form
+  fireEvent.click(submitButton)
+
+  // Check if the event handler was called with the right details
+  expect(mockCreateBlog).toHaveBeenCalledWith({
+    title: 'New Blog Title',
+    author: 'John Doe',
+    url: 'http://example.com/new-blog'
+  })
+})
